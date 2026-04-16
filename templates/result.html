@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetinaAI — Result</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="bg-mesh"></div>
+
+<nav>
+  <a class="nav-logo" href="/">👁 RetinaAI <span class="dot"></span></a>
+  <div class="nav-links">
+    <a class="nav-btn" href="/">Home</a>
+    <a class="nav-btn" href="/predict">🔬 Predict</a>
+    <a class="nav-btn" href="/about">About</a>
+    <a class="nav-btn" href="/signin">Sign In</a>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="result-container">
+
+    <div class="page-header">
+      <h1>Prediction Result</h1>
+      <p>Dual-stream analysis complete. Review the DR stage and confidence score below.</p>
+    </div>
+
+    <div class="result-panel">
+
+      <!-- Stage + badge -->
+      <div class="result-stage">
+        <span class="stage-badge" id="stageBadge">—</span>
+        <span class="stage-name"  id="stageName">—</span>
+      </div>
+
+      <!-- Confidence bar -->
+      <div class="confidence-row">
+        <span class="confidence-label">Confidence</span>
+        <div class="confidence-bar">
+          <div class="confidence-fill" id="confidenceFill" style="width:0%"></div>
+        </div>
+        <span class="confidence-pct" id="confidencePct">—</span>
+      </div>
+
+      <!-- Uploaded images -->
+      <div class="result-images">
+        <div class="result-img-wrap">
+          <img id="resultFundus" src="" alt="Fundus image">
+          <div class="result-img-label">Fundus Image</div>
+        </div>
+        <div class="result-img-wrap">
+          <img id="resultOct" src="" alt="OCT scan">
+          <div class="result-img-label">OCT Scan</div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="result-actions">
+        <a href="/predict" class="btn-primary">🔬 Try Another Image</a>
+        <a href="/"        class="btn-ghost">← Back to Home</a>
+      </div>
+
+    </div><!-- /result-panel -->
+  </div><!-- /result-container -->
+</div><!-- /page-wrap -->
+
+<div class="toast" id="toast"></div>
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
+<script>
+  const stageMap = {
+    'No DR':            { cls: 'stage-0', idx: 0 },
+    'Mild':             { cls: 'stage-1', idx: 1 },
+    'Moderate':         { cls: 'stage-2', idx: 2 },
+    'Severe':           { cls: 'stage-3', idx: 3 },
+    'Proliferative DR': { cls: 'stage-4', idx: 4 },
+  };
+
+  // Read result from URL query params passed by predict page
+  const params     = new URLSearchParams(window.location.search);
+  const prediction = params.get('prediction') || 'Unknown';
+  const confidence = parseFloat(params.get('confidence') || 0);
+  const fundusImg  = params.get('fundus_img') || '';
+  const octImg     = params.get('oct_img')    || '';
+
+  const stage = stageMap[prediction] || { cls: 'stage-0', idx: 0 };
+
+  // Populate
+  document.getElementById('stageBadge').className   = 'stage-badge ' + stage.cls;
+  document.getElementById('stageBadge').textContent  = 'Stage ' + stage.idx;
+  document.getElementById('stageName').textContent   = prediction;
+  document.getElementById('confidencePct').textContent = confidence + '%';
+
+  if (fundusImg) document.getElementById('resultFundus').src = '/static/uploads/' + fundusImg;
+  if (octImg)    document.getElementById('resultOct').src    = '/static/uploads/' + octImg;
+
+  // Animate confidence bar after paint
+  setTimeout(() => {
+    document.getElementById('confidenceFill').style.width = confidence + '%';
+  }, 150);
+
+  showToast('✅ ' + prediction + ' — ' + confidence + '% confidence');
+</script>
+</body>
+</html>

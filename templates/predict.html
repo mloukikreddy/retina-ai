@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetinaAI — Predict</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="bg-mesh"></div>
+
+<nav>
+  <a class="nav-logo" href="/">👁 RetinaAI <span class="dot"></span></a>
+  <div class="nav-links">
+    <a class="nav-btn" href="/">Home</a>
+    <a class="nav-btn active-link" href="/predict">🔬 Predict</a>
+    <a class="nav-btn" href="/about">About</a>
+    <a class="nav-btn" href="/signin">Sign In</a>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="predict-container">
+    <div class="page-header">
+      <h1>DR Stage Prediction</h1>
+      <p>Upload a fundus photograph and an OCT scan. Both images are required to run the dual-stream analysis.</p>
+    </div>
+
+    <form id="predictForm" enctype="multipart/form-data">
+
+      <div class="upload-grid">
+
+        <!-- Fundus Upload -->
+        <div class="upload-zone" id="fundusZone"
+             ondragover="handleDrag(event,'fundusZone')"
+             ondragleave="handleDragLeave('fundusZone')"
+             ondrop="handleDrop(event,'fundus')">
+          <input type="file" name="fundus" id="fundusInput" accept="image/*"
+                 onchange="handleFile(event,'fundus')">
+          <span class="upload-icon" id="fundusIcon">🔴</span>
+          <span class="upload-label">Fundus Image</span>
+          <span class="upload-hint">PNG · JPG · JPEG &nbsp;|&nbsp; drag & drop or click</span>
+          <div class="upload-filename" id="fundusName"></div>
+          <img class="upload-preview" id="fundusPreview" alt="Fundus preview">
+        </div>
+
+        <!-- OCT Upload -->
+        <div class="upload-zone" id="octZone"
+             ondragover="handleDrag(event,'octZone')"
+             ondragleave="handleDragLeave('octZone')"
+             ondrop="handleDrop(event,'oct')">
+          <input type="file" name="oct" id="octInput" accept="image/*"
+                 onchange="handleFile(event,'oct')">
+          <span class="upload-icon" id="octIcon">🔵</span>
+          <span class="upload-label">OCT Scan</span>
+          <span class="upload-hint">PNG · JPG · JPEG &nbsp;|&nbsp; drag & drop or click</span>
+          <div class="upload-filename" id="octName"></div>
+          <img class="upload-preview" id="octPreview" alt="OCT preview">
+        </div>
+
+      </div><!-- /upload-grid -->
+
+      <div class="predict-card">
+        <h3>Run Analysis</h3>
+        <button type="button" class="btn-predict" id="predictBtn"
+                onclick="runPrediction()" disabled>
+          <span id="predictBtnText">Analyze Images</span>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="9" r="7.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M7 6l5 3-5 3V6z" fill="currentColor"/>
+          </svg>
+        </button>
+        <div class="loading-bar" id="loadingBar"><div class="loading-fill"></div></div>
+      </div>
+
+    </form><!-- /predictForm -->
+
+    <div class="error-panel" id="errorPanel"></div>
+
+  </div><!-- /predict-container -->
+</div><!-- /page-wrap -->
+
+<div class="toast" id="toast"></div>
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
+<script>
+  // ── File handling ──────────────────────────────
+  const files = { fundus: null, oct: null };
+
+  function handleFile(event, type) {
+    const file = event.target.files[0];
+    if (file) processFile(file, type);
+  }
+  function handleDrag(event, zoneId) {
+    event.preventDefault();
+    document.getElementById(zoneId).classList.add('drag-over');
+  }
+  function handleDragLeave(zoneId) {
+    document.getElementById(zoneId).classList.remove('drag-over');
+  }
+  function handleDrop(event, type) {
+    event.preventDefault();
+    const zoneId = type === 'fundus' ? 'fundusZone' : 'octZone';
+    document.getElementById(zoneId).classList.remove('drag-over');
+    const file = event.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) processFile(file, type);
+  }
+  function processFile(file, type) {
+    files[type] = file;
+
+    // Update the actual <input> so FormData picks it up
+    const input = document.getElementById(type + 'Input');
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+
+    const zone    = document.getElementById(type === 'fundus' ? 'fundusZone' : 'octZone');
+    const nameEl  = document.getElementById(type + 'Name');
+    const preview = document.getElementById(type + 'Preview');
+
+    nameEl.textContent = file.name;
+    zone.classList.add('has-file');
+
+    const reader = new FileReader();
+    reader.onload = e => { preview.src = e.target.result; };
+    reader.readAsDataURL(file);
+
+    checkReady();
+    showToast('✅ ' + (type === 'fundus' ? 'Fundus' : 'OCT') + ' image loaded');
+  }
+  function checkReady() {
+    document.getElementById('predictBtn').disabled = !(files.fundus && files.oct);
+  }
+
+  // ── Prediction ─────────────────────────────────
+  async function runPrediction() {
+    const btn      = document.getElementById('predictBtn');
+    const btnText  = document.getElementById('predictBtnText');
+    const loader   = document.getElementById('loadingBar');
+    const errPanel = document.getElementById('errorPanel');
+
+    btn.disabled = true;
+    btnText.textContent = 'Analyzing…';
+    loader.classList.add('active');
+    errPanel.classList.remove('show');
+
+    const formData = new FormData(document.getElementById('predictForm'));
+
+    try {
+      const response = await fetch('/predict', { method: 'POST', body: formData });
+      const data     = await response.json();
+
+      if (!response.ok || data.error) throw new Error(data.error || 'Prediction failed.');
+
+      // Redirect to result page with query params
+      const params = new URLSearchParams({
+        prediction: data.prediction,
+        confidence: data.confidence,
+        fundus_img: data.fundus_img,
+        oct_img:    data.oct_img
+      });
+      window.location.href = '/result?' + params.toString();
+
+    } catch (err) {
+      errPanel.textContent = '⚠️ ' + err.message;
+      errPanel.classList.add('show');
+      showToast('❌ ' + err.message);
+      btn.disabled = false;
+      btnText.textContent = 'Analyze Images';
+      loader.classList.remove('active');
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetinaAI — Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="bg-mesh"></div>
+
+<nav>
+  <a class="nav-logo" href="/">👁 RetinaAI <span class="dot"></span></a>
+  <div class="nav-links">
+    <a class="nav-btn active-link" href="/">Home</a>
+    <a class="nav-btn" href="/predict">🔬 Predict</a>
+    <a class="nav-btn" href="/about">About</a>
+    <a class="nav-btn" href="/signin">Sign In</a>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="home-hero">
+    <div class="hero-badge"><span class="badge-dot"></span> AI-Powered Clinical Tool</div>
+    <h1 class="hero-title">
+      Detect Diabetic<br>
+      <span class="hi">Retinopathy</span><br>
+      Instantly
+    </h1>
+    <p class="hero-sub">
+      Upload fundus and OCT images for automated DR stage classification
+      using a dual-stream deep learning pipeline —
+      EfficientNetB0 + DenseNet121 fused with LightGBM.
+    </p>
+    <div class="hero-actions">
+      <a href="/predict" class="btn-primary">
+        🔬 Run Prediction
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <a href="/about" class="btn-ghost">Learn How It Works</a>
+    </div>
+    <div class="stats-row">
+      <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">DR Stages</div></div>
+      <div class="stat-item"><div class="stat-num">2</div><div class="stat-label">Modalities</div></div>
+      <div class="stat-item"><div class="stat-num">2304</div><div class="stat-label">Feature Dims</div></div>
+      <div class="stat-item"><div class="stat-num">~1s</div><div class="stat-label">Inference</div></div>
+    </div>
+  </div>
+
+  <div class="features-section">
+    <div class="section-label">Architecture</div>
+    <div class="section-title">How the Model Works</div>
+    <div class="cards-grid">
+      <div class="feature-card">
+        <div class="card-icon">🧠</div>
+        <div class="card-title">EfficientNetB0 — Fundus</div>
+        <div class="card-desc">Processes fundus photographs pretrained on ImageNet. Global Average Pooling extracts a 1280-dim feature vector capturing vascular patterns.</div>
+      </div>
+      <div class="feature-card">
+        <div class="card-icon">🔭</div>
+        <div class="card-title">DenseNet121 — OCT</div>
+        <div class="card-desc">Processes OCT scans with dense connectivity. Extracts 1024-dim features encoding retinal layer structure and abnormalities.</div>
+      </div>
+      <div class="feature-card">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">LightGBM Fusion</div>
+        <div class="card-desc">Concatenated 2304-dim feature vector is scaled and fed into LightGBM for final 5-class DR stage classification with probability output.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetinaAI — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="bg-mesh"></div>
+
+<nav>
+  <a class="nav-logo" href="/">👁 RetinaAI <span class="dot"></span></a>
+  <div class="nav-links">
+    <a class="nav-btn" href="/">Home</a>
+    <a class="nav-btn" href="/predict">🔬 Predict</a>
+    <a class="nav-btn" href="/about">About</a>
+    <a class="nav-btn active-link" href="/signin">Sign In</a>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="signin-container">
+    <div class="signin-card">
+      <div class="signin-title">Welcome back</div>
+      <div class="signin-sub">Sign in to your RetinaAI account</div>
+
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input type="text" class="form-input" id="signinUser" placeholder="Enter username" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="signinPass" placeholder="Enter password"
+               autocomplete="current-password"
+               onkeydown="if(event.key==='Enter') handleSignIn()">
+      </div>
+
+      <button class="btn-signin" onclick="handleSignIn()">Sign In</button>
+      <div class="signin-error" id="signinError">⚠️ Invalid credentials. Please try again.</div>
+
+      <div class="divider">or</div>
+      <a href="/" class="btn-ghost" style="width:100%;justify-content:center;display:flex">← Back to Home</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
+<script>
+  // Mock sign-in — replace with real POST /login if needed
+  function handleSignIn() {
+    const user = document.getElementById('signinUser').value.trim();
+    const pass = document.getElementById('signinPass').value;
+    const err  = document.getElementById('signinError');
+
+    if (user === 'admin' && pass === 'retina123') {
+      err.classList.remove('show');
+      showToast('👋 Welcome, ' + user + '!');
+      setTimeout(() => window.location.href = '/', 1000);
+    } else {
+      err.classList.add('show');
+    }
+  }
+</script>
+</body>
+</html>
