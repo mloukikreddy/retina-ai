@@ -12,6 +12,7 @@
 
 <nav>
   <a class="nav-logo" href="/">👁 RetinaAI <span class="dot"></span></a>
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">☰</button>
   <div class="nav-links">
     <a class="nav-btn active-link" href="/">Home</a>
     <a class="nav-btn" href="/predict">🔬 Predict</a>
@@ -32,7 +33,7 @@
     <p class="hero-sub">
       Upload fundus and OCT images for automated DR stage classification
       using a dual-stream deep learning pipeline —
-      EfficientNetB0 + DenseNet121 fused with LightGBM.
+      Dual DenseNet121 fused with LightGBM.
     </p>
     <div class="hero-actions">
       <a href="/predict" class="btn-primary">
@@ -44,21 +45,21 @@
       <a href="/about" class="btn-ghost">Learn How It Works</a>
     </div>
     <div class="stats-row">
-      <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">DR Stages</div></div>
+      <div class="stat-item"><div class="stat-num">3</div><div class="stat-label">DR Stages</div></div>
       <div class="stat-item"><div class="stat-num">2</div><div class="stat-label">Modalities</div></div>
-      <div class="stat-item"><div class="stat-num">2304</div><div class="stat-label">Feature Dims</div></div>
+      <div class="stat-item"><div class="stat-num">2048</div><div class="stat-label">Feature Dims</div></div>
       <div class="stat-item"><div class="stat-num">~1s</div><div class="stat-label">Inference</div></div>
     </div>
   </div>
 
-  <div class="features-section">
+  <div class="features-section fade-in">
     <div class="section-label">Architecture</div>
     <div class="section-title">How the Model Works</div>
     <div class="cards-grid">
       <div class="feature-card">
         <div class="card-icon">🧠</div>
-        <div class="card-title">EfficientNetB0 — Fundus</div>
-        <div class="card-desc">Processes fundus photographs pretrained on ImageNet. Global Average Pooling extracts a 1280-dim feature vector capturing vascular patterns.</div>
+        <div class="card-title">DenseNet121 — Fundus</div>
+        <div class="card-desc">Processes fundus photographs with dense connectivity pretrained on ImageNet. Global Average Pooling extracts a 1024-dim feature vector capturing vascular patterns.</div>
       </div>
       <div class="feature-card">
         <div class="card-icon">🔭</div>
@@ -68,11 +69,15 @@
       <div class="feature-card">
         <div class="card-icon">⚡</div>
         <div class="card-title">LightGBM Fusion</div>
-        <div class="card-desc">Concatenated 2304-dim feature vector is scaled and fed into LightGBM for final 5-class DR stage classification with probability output.</div>
+        <div class="card-desc">Concatenated 2048-dim feature vector is scaled and fed into LightGBM for final 3-class DR stage classification with probability output.</div>
       </div>
-    </div>
   </div>
 </div>
+
+<footer class="site-footer">
+  <p>© 2026 RetinaAI — Multimodal Diabetic Retinopathy Detection System</p>
+  <p class="footer-sub">Dual DenseNet121 + LightGBM · Built for clinical screening assistance</p>
+</footer>
 
 <div class="toast" id="toast"></div>
 <script src="{{ url_for('static', filename='theme.js') }}"></script>

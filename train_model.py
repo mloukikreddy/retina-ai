@@ -4,9 +4,9 @@ import numpy as np
 import joblib
 import pandas as pd
 
-from keras.applications import EfficientNetB0, DenseNet121
-from keras.layers import GlobalAveragePooling2D
-from keras.models import Model
+from tensorflow.keras.applications import DenseNet121
+from tensorflow.keras.layers import GlobalAveragePooling2D
+from tensorflow.keras.models import Model
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
@@ -22,6 +22,7 @@ OCT_DIR    = "dataset/OCT/OCT_NEW"
 
 FUNDUS_CSV = "dataset/EYE FUNDUS.csv"
 OCT_CSV    = "dataset/OCT.csv"
+
 
 # Augmented copies per original image
 # 410 pairs x (1 original + 8 augmented) = ~3690 samples
@@ -225,7 +226,7 @@ for u, c in zip(unique, counts):
 # ── BUILD FEATURE EXTRACTORS ──────────────────────────────────
 print("\nBuilding feature extractor models...")
 
-fundus_base  = EfficientNetB0(weights="imagenet", include_top=False, input_shape=(224, 224, 3))
+fundus_base  = DenseNet121(weights="imagenet", include_top=False, input_shape=(224, 224, 3))
 oct_base     = DenseNet121(weights="imagenet",    include_top=False, input_shape=(224, 224, 3))
 
 fundus_model = Model(fundus_base.input, GlobalAveragePooling2D()(fundus_base.output))
@@ -233,7 +234,7 @@ oct_model    = Model(oct_base.input,   GlobalAveragePooling2D()(oct_base.output)
 
 
 # ── EXTRACT FEATURES ──────────────────────────────────────────
-print("\nExtracting fundus features (EfficientNetB0)...")
+print("\nExtracting fundus features (DenseNet121)...")
 f_feat = fundus_model.predict(Xf_all, batch_size=16, verbose=1)
 
 print("\nExtracting OCT features (DenseNet121)...")

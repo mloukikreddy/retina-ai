@@ -395,3 +395,89 @@ nav {
   transition: all .35s cubic-bezier(.34,1.56,.64,1); min-width: 240px;
 }
 .toast.show { transform: translateY(0); opacity: 1; }
+
+/* ══════════════════════════════════════════
+   RECOMMENDATION BOX
+══════════════════════════════════════════ */
+.recommendation-box {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.25rem 1.5rem;
+  margin-top: 1.5rem; margin-bottom: 1.5rem;
+}
+.rec-label {
+  font-family: 'Syne', sans-serif; font-size: .78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--accent); margin-bottom: .6rem;
+}
+.recommendation-box p {
+  font-size: .9rem; color: var(--text2); line-height: 1.6;
+}
+
+/* ══════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════ */
+.site-footer {
+  position: relative; z-index: 1;
+  text-align: center; padding: 2.5rem 2rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+}
+.site-footer p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .85rem; color: var(--text2);
+}
+.footer-sub {
+  font-size: .75rem !important; color: var(--text3) !important;
+  margin-top: .35rem;
+}
+
+/* ══════════════════════════════════════════
+   MOBILE HAMBURGER MENU
+══════════════════════════════════════════ */
+.hamburger {
+  display: none; background: none; border: none;
+  color: var(--text); cursor: pointer; padding: .5rem;
+  font-size: 1.4rem; z-index: 101;
+}
+@media(max-width: 680px) {
+  .hamburger { display: flex; align-items: center; }
+  .nav-links {
+    position: fixed; top: 0; right: -100%;
+    width: 260px; height: 100vh;
+    background: var(--bg2); border-left: 1px solid var(--border);
+    flex-direction: column; padding: 5rem 1.5rem 2rem;
+    gap: .5rem; transition: right .35s ease;
+    z-index: 100; backdrop-filter: blur(20px);
+  }
+  .nav-links.open { right: 0; }
+  .nav-btn { width: 100%; justify-content: flex-start; padding: .75rem 1rem; }
+  .theme-toggle { margin-left: 0; margin-top: .5rem; }
+}
+
+/* ══════════════════════════════════════════
+   SCROLL ANIMATIONS
+══════════════════════════════════════════ */
+.fade-in {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.fade-in.visible {
+  opacity: 1; transform: translateY(0);
+}
+
+/* ══════════════════════════════════════════
+   EXTRA POLISH
+══════════════════════════════════════════ */
+.drag-over { border-color: var(--accent) !important; background: var(--glow) !important; }
+
+/* Smooth focus rings */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(56,189,248,.3);
+  color: var(--text);
+}

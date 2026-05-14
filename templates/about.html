@@ -12,6 +12,7 @@
 
 <nav>
   <a class="nav-logo" href="/">👁 RetinaAI <span class="dot"></span></a>
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">☰</button>
   <div class="nav-links">
     <a class="nav-btn" href="/">Home</a>
     <a class="nav-btn" href="/predict">🔬 Predict</a>
@@ -41,17 +42,17 @@
       <div class="step-card">
         <div class="step-num">Step 02</div>
         <div class="step-title">Feature Extraction</div>
-        <div class="step-desc">EfficientNetB0 (fundus → 1280-d) and DenseNet121 (OCT → 1024-d) via Global Average Pooling.</div>
+        <div class="step-desc">DenseNet121 (fundus → 1024-d) and DenseNet121 (OCT → 1024-d) via Global Average Pooling.</div>
       </div>
       <div class="step-card">
         <div class="step-num">Step 03</div>
         <div class="step-title">Feature Fusion</div>
-        <div class="step-desc">Vectors concatenated to 2304-d and passed through a fitted StandardScaler.</div>
+        <div class="step-desc">Vectors concatenated to 2048-d and passed through a fitted StandardScaler.</div>
       </div>
       <div class="step-card">
         <div class="step-num">Step 04</div>
         <div class="step-title">Classification</div>
-        <div class="step-desc">LightGBM (300 estimators, lr 0.05) outputs the DR stage and confidence probability.</div>
+        <div class="step-desc">LightGBM (500 estimators, lr 0.05) outputs the DR stage and confidence probability.</div>
       </div>
     </div>
 
@@ -60,25 +61,28 @@
         <tr><th>Component</th><th>Model</th><th>Output Dims</th><th>Weights</th></tr>
       </thead>
       <tbody>
-        <tr><td>Fundus Stream</td><td>EfficientNetB0</td><td>1280</td><td><span class="tag">ImageNet</span></td></tr>
+        <tr><td>Fundus Stream</td><td>DenseNet121</td><td>1024</td><td><span class="tag">ImageNet</span></td></tr>
         <tr><td>OCT Stream</td><td>DenseNet121</td><td>1024</td><td><span class="tag">ImageNet</span></td></tr>
-        <tr><td>Scaler</td><td>StandardScaler</td><td>2304 → 2304</td><td><span class="tag">Fitted</span></td></tr>
-        <tr><td>Classifier</td><td>LightGBM</td><td>5 classes</td><td><span class="tag">Custom</span></td></tr>
+        <tr><td>Scaler</td><td>StandardScaler</td><td>2048 → 2048</td><td><span class="tag">Fitted</span></td></tr>
+        <tr><td>Classifier</td><td>LightGBM</td><td>3 classes</td><td><span class="tag">Custom</span></td></tr>
       </tbody>
     </table>
 
     <div class="section-label">DR Staging</div>
     <div class="section-title" style="text-align:left;margin-bottom:1.5rem">Classification Classes</div>
-    <div class="cards-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
-      <div class="feature-card"><div class="card-icon">🟢</div><div class="card-title">No DR</div><div class="card-desc">No signs of diabetic retinopathy detected.</div></div>
-      <div class="feature-card"><div class="card-icon">🟡</div><div class="card-title">Mild</div><div class="card-desc">Microaneurysms only present.</div></div>
-      <div class="feature-card"><div class="card-icon">🟠</div><div class="card-title">Moderate</div><div class="card-desc">More than microaneurysms, less than severe.</div></div>
-      <div class="feature-card"><div class="card-icon">🔴</div><div class="card-title">Severe</div><div class="card-desc">Extensive haemorrhages or venous beading.</div></div>
-      <div class="feature-card"><div class="card-icon">⛔</div><div class="card-title">Proliferative DR</div><div class="card-desc">Neovascularisation or vitreous haemorrhage present.</div></div>
+    <div class="cards-grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+      <div class="feature-card"><div class="card-icon">🟢</div><div class="card-title">No DR</div><div class="card-desc">No signs of diabetic retinopathy detected. Retina appears healthy.</div></div>
+      <div class="feature-card"><div class="card-icon">🟡</div><div class="card-title">NPDR</div><div class="card-desc">Non-Proliferative DR — microaneurysms, haemorrhages, or hard exudates present.</div></div>
+      <div class="feature-card"><div class="card-icon">🔴</div><div class="card-title">PDR</div><div class="card-desc">Proliferative DR — neovascularisation or vitreous haemorrhage present. Urgent referral needed.</div></div>
     </div>
 
   </div>
 </div>
+
+<footer class="site-footer">
+  <p>© 2026 RetinaAI — Multimodal Diabetic Retinopathy Detection System</p>
+  <p class="footer-sub">Dual DenseNet121 + LightGBM · Built for clinical screening assistance</p>
+</footer>
 
 <div class="toast" id="toast"></div>
 <script src="{{ url_for('static', filename='theme.js') }}"></script>

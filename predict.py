@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import joblib
-import keras
+import tensorflow.keras as keras
 from config import IMG_SIZE, CLASS_MAP
 
 fundus_model = keras.models.load_model("models/fundus_model.h5", compile=False)

@@ -12,6 +12,7 @@
 
 <nav>
   <a class="nav-logo" href="/">👁 RetinaAI <span class="dot"></span></a>
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">☰</button>
   <div class="nav-links">
     <a class="nav-btn" href="/">Home</a>
     <a class="nav-btn" href="/predict">🔬 Predict</a>
@@ -58,6 +59,12 @@
         </div>
       </div>
 
+      <!-- Clinical Recommendation -->
+      <div class="recommendation-box">
+        <div class="rec-label">📋 Clinical Recommendation</div>
+        <p id="recommendation">—</p>
+      </div>
+
       <!-- Actions -->
       <div class="result-actions">
         <a href="/predict" class="btn-primary">🔬 Try Another Image</a>
@@ -68,15 +75,18 @@
   </div><!-- /result-container -->
 </div><!-- /page-wrap -->
 
+<footer class="site-footer">
+  <p>© 2026 RetinaAI — Multimodal Diabetic Retinopathy Detection System</p>
+  <p class="footer-sub">Dual DenseNet121 + LightGBM · Built for clinical screening assistance</p>
+</footer>
+
 <div class="toast" id="toast"></div>
 <script src="{{ url_for('static', filename='theme.js') }}"></script>
 <script>
   const stageMap = {
-    'No DR':            { cls: 'stage-0', idx: 0 },
-    'Mild':             { cls: 'stage-1', idx: 1 },
-    'Moderate':         { cls: 'stage-2', idx: 2 },
-    'Severe':           { cls: 'stage-3', idx: 3 },
-    'Proliferative DR': { cls: 'stage-4', idx: 4 },
+    'No DR': { cls: 'stage-0', idx: 0, rec: 'No signs of diabetic retinopathy. Continue routine annual screening.' },
+    'NPDR':  { cls: 'stage-1', idx: 1, rec: 'Non-Proliferative DR detected. Schedule follow-up with an ophthalmologist within 3–6 months.' },
+    'PDR':   { cls: 'stage-2', idx: 2, rec: 'Proliferative DR detected. Urgent specialist referral recommended.' },
   };
 
   // Read result from URL query params passed by predict page
@@ -86,13 +96,17 @@
   const fundusImg  = params.get('fundus_img') || '';
   const octImg     = params.get('oct_img')    || '';
 
-  const stage = stageMap[prediction] || { cls: 'stage-0', idx: 0 };
+  const stage = stageMap[prediction] || { cls: 'stage-0', idx: 0, rec: '' };
 
   // Populate
   document.getElementById('stageBadge').className   = 'stage-badge ' + stage.cls;
   document.getElementById('stageBadge').textContent  = 'Stage ' + stage.idx;
   document.getElementById('stageName').textContent   = prediction;
   document.getElementById('confidencePct').textContent = confidence + '%';
+
+  // Show recommendation
+  const recEl = document.getElementById('recommendation');
+  if (recEl && stage.rec) recEl.textContent = stage.rec;
 
   if (fundusImg) document.getElementById('resultFundus').src = '/static/uploads/' + fundusImg;
   if (octImg)    document.getElementById('resultOct').src    = '/static/uploads/' + octImg;
